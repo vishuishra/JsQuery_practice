@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Loader Example</title>
+    <style>
+        #loader {
+            display: none;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+    <div id="loader">Loading...</div>
+
+    <div id="content" style="display: none;">
+        <h2>Data Table</h2>
+        <table id="dataTable" border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <h2>Add New Item</h2>
+        <form id="addItemForm">
+            <label for="itemName">Name:</label>
+            <input type="text" id="itemName" required>
+            <button type="button" onclick="addItem()">Add Item</button>
+        </form>
+    </div>
+
+    <script>
+        function showLoader() {
+            $("#loader").show();
+            $("#content").hide();
+        }
+
+        function hideLoader() {
+            $("#loader").hide();
+            $("#content").show();
+        }
+
+        function addItem() {
+            showLoader();
+
+            // Get data from form
+            var itemName = $("#itemName").val();
+
+            // Make Ajax request to post data to API endpoint
+            $.ajax({
+                url: "https://655306915449cfda0f2e0066.mockapi.io/form",
+                type: "POST",
+                data: { name: itemName },
+                success: function(response) {
+                    // After successful post, render the newly posted data
+                    renderNewData(response);
+                    hideLoader();
+                },
+                error: function(error) {
+                    console.error("Error adding item:", error);
+                    hideLoader();
+                }
+            });
+        }
+
+        function renderNewData(newItem) {
+            // Add the new item to the table dynamically
+            var newRow = "<tr><td>" + newItem.id + "</td><td>" + newItem.name + "</td></tr>";
+            $("#dataTable tbody").append(newRow);
+        }
+
+        function fetchDataAndRender() {
+            // Make Ajax request to get data from API endpoint
+            $.ajax({
+                url: "https://655306915449cfda0f2e0066.mockapi.io/form",
+                type: "GET",
+                success: function(data) {
+                    // Render the fetched data in the table
+                    for (var i = 0; i < data.length; i++) {
+                        renderNewData(data[i]);
+                    }
+                    hideLoader();
+                },
+                error: function(error) {
+                    console.error("Error fetching data:", error);
+                    hideLoader();
+                }
+            });
+        }
+
+        // Simulate fetching initial data on page load
+        showLoader();
+        setTimeout(function() {
+            fetchDataAndRender();
+        }, 2000); // Simulating a delay in fetching data
+    </script>
+
+</body>
+</html>
